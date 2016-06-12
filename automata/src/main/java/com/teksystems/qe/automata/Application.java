@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
@@ -67,31 +69,7 @@ public abstract class Application {
 				LOG.warn("Defined view '"+checkMe.getName()+"' is missing @ViewStates annotation not loaded");
 				continue;
 			}
-			
-			Object[] args 					= getViewData();
-			Constructor<?>[] constructors 	= checkMe.getConstructors();
-			boolean match				 	= false;
-			constructorLoop:
-			for (int i=0; i<constructors.length;i++) {
-				Constructor<?> thisConstructor = constructors[i];
-				if (thisConstructor.getParameterTypes().length != args.length) {
-					continue constructorLoop;
-				}
-				Class<?>[] constParams = thisConstructor.getParameterTypes();
-				for (int p=0; p<constParams.length;p++) {
-					if (!constParams[p].isAssignableFrom(args[p].getClass())) {
-						continue constructorLoop;
-					}
-				}
-				match = true;
-				break;
-			}
-			
-			if(!match){
-				LOG.warn("Defined view '"+checkMe.getName()+"' does not have a proper constructor matching view data.");
-				continue;
-			}
-			
+
 			String[] stateArr		= annotation.value();
 			for (int i=0; i<stateArr.length;i++) {
 				String state = stateArr[i];
@@ -147,17 +125,36 @@ public abstract class Application {
 				}  
 			});
 			try {
-				LOG.info("Current View: "+viewMap.get(lastState).getClass().getSimpleName()+" [state=\""+lastState+"\"]");
+				
 				Object[] args = h.get(1, TimeUnit.MINUTES);
 				Class[] cArg = new Class[args.length];
 				for(int i=0; i<args.length;i++)
 					cArg[i] = args.getClass();
-				return viewMap.get(lastState).getDeclaredConstructor(cArg).newInstance(args);
+				
+				
+				Constructor<?>[] constructors 	= viewMap.get(lastState).getConstructors();
+				constructorLoop:
+				for (int i=0; i<constructors.length;i++) {
+					Constructor<?> thisConstructor = constructors[i];
+					if (thisConstructor.getParameterTypes().length != args.length) {
+						continue constructorLoop;
+					}
+					Class<?>[] constParams = thisConstructor.getParameterTypes();
+					for (int p=0; p<constParams.length;p++) {
+						if (!constParams[p].isAssignableFrom(args[p].getClass())) {
+							continue constructorLoop;
+						}
+					}
+					LOG.info("Current View: "+viewMap.get(lastState).getSimpleName()+" [state=\""+lastState+"\"]");
+					return (BaseView) thisConstructor.newInstance(args);
+				}
+				
+				throw new ViewInitializationException("Failed to get create an instance of the view \"" + viewMap.get(lastState).getSimpleName()+"\" unable to find proper constructor", null);
 
 			} catch (Exception e) {
 				LOG.error(e);
 				h.cancel(true);
-				throw new ViewInitializationException("Failed to get create an isntance of the view for state: \"" + lastState+"\"", e);
+				throw new ViewInitializationException("Failed to get create an instance of the view for state: \"" + lastState+"\"", e);
 			}finally{
 				executor.shutdownNow();
 			}
@@ -194,10 +191,10 @@ public abstract class Application {
 				});
 				try {
 					handler.get(config.getViewTimeout(), TimeUnit.MILLISECONDS);
-				} catch (Exception e) {
+				} catch (TimeoutException e) {
 					LOG.error(e);
 					handler.cancel(true);
-					throw new ViewProcessingException("View "+currentView.getClass().getSimpleName()+" complete action took longer than 2 minutes to complete", e);
+					throw new ViewProcessingException("View "+currentView.getClass().getSimpleName()+" complete action took longer than "+config.getViewTimeout()+" ms to complete", e);
 				}finally{
 					executor.shutdownNow();
 				}
