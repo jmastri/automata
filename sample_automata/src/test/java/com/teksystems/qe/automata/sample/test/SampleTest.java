@@ -19,13 +19,17 @@ public class SampleTest {
 
 	@Test
 	public void aTest() throws Exception{
+		//Data however you want to set it up
 		GenericDataObject data = new GenericDataObject();
 		data.setQuery("automata");
+		
+		//create an instance of the application
 		GoogleApplication app = new GoogleApplication(
 				getDriver(), 
 				data
 				);
 		
+		//run until a page.
 		SearchResults results = app.runUntilView(SearchResults.class);
 
 		Assert.assertNotNull(

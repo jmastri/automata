@@ -18,7 +18,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
-
+/**
+ * Application level automation framework.
+ * 
+ * 
+ * @author James Mastri
+ * @author Jeff Clyne
+ * @author Matt Logston
+ * @author Ben Kresky
+ * @author David Eltgroth
+ * @author Jason Polk
+ */
 
 
 
@@ -40,9 +50,25 @@ public abstract class Application {
 		config = configuration;
 		initialize();
 	}
-
+	
+	/**
+	 * abstract method that must return a current state based on 
+	 * application specific logic.
+	 * 
+	 * @return string representation of the current state
+	 */
 	protected abstract String getState();
+	
+	/**
+	 * Abstract method used to gather the parameters for the current view
+	 * 
+	 * @return an array of data that is passed into view constructors
+	 */
 	protected abstract Object[] getViewData();
+	
+	/**
+	 * Uses reflection to fill the map of views
+	 */
 	
 	private void initialize() {
 		viewMap.clear();
@@ -85,8 +111,10 @@ public abstract class Application {
 		LOG.info("Views loaded found "+viewMap.size()+" views.");
 	}
 	
-	
-	public void waitForViewChange() {
+	/**
+	 * Uses the application defined getState() to determine if the state has changed
+	 */
+	public void waitForStateChange() {
 		long start = System.currentTimeMillis();
 		LOG.info("waiting for transition from: "+currentView.getClass().getSimpleName()+" [state=\""+lastState+"\"]");
 		while (lastState.equalsIgnoreCase(getState())) {
@@ -98,6 +126,15 @@ public abstract class Application {
 			} catch (InterruptedException e) {}
 		}
 	}
+	
+	/**
+	 * Uses reflection combined with the abstract methods to create an instance
+	 * of the current view we are on.
+	 * 
+	 * @return an instance of the current View based on the current state.
+	 * @throws ViewInitializationException
+	 * @throws ViewNotDefinedException
+	 */
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected BaseView getCurrentView() throws ViewInitializationException, ViewNotDefinedException{
@@ -163,7 +200,14 @@ public abstract class Application {
 		}
 	}
 	
-	
+	/**
+	 * Base function for cycling through each view and processing it.
+	 * Uses the EndState parameter to determine when to stop processing.
+	 * 
+	 * @param Class implementing EndState to trigger process stopping.
+	 * @return The instance of the page we stopped on
+	 * @throws Exception
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public BaseView process(EndState end) throws Exception{
 		try{
@@ -234,7 +278,7 @@ public abstract class Application {
 					}
 				}
 				callListeners(ViewEvent.VIEW_DONE);
-				waitForViewChange();
+				waitForStateChange();
 				callListeners(ViewEvent.VIEW_CHANGE);
 				if(end.stop(this, currentView, lastState)){
 					LOG.info("End condition reached, stopping process.");
@@ -253,6 +297,12 @@ public abstract class Application {
 		return currentView;
 	}
 
+	/**
+	 * Triggers all handlers with proper event data
+	 * 
+	 * @param Event type
+	 */
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void callListeners(final ViewEvent evt) {
 		LOG.debug("Calling event listeners for "+evt.name());
@@ -277,9 +327,19 @@ public abstract class Application {
 		}
 	}
 	
+	/**
+	 * Add a listener to the pool of listeners
+	 * @param Listener that implements ApplicationListener
+	 */
+	
 	public void registerListener(ApplicationListener listener){
 		listeners.put(listener.getClass().getSimpleName(), listener);
 	}
+	
+	/**
+	 * Remove a listener to the pool of listeners
+	 * @param Listener that implements ApplicationListener
+	 */
 	
 	public void unregisterListener(ApplicationListener listener){
 		Iterator<String> it = listeners.keySet().iterator();
@@ -289,17 +349,24 @@ public abstract class Application {
 		}
 	}
 	
+	
+	/**
+	 * Utility function for generating a common EndState
+	 * 
+	 * @param Listener that implements ApplicationListener
+	 */
+	
 	@SuppressWarnings("unchecked")
 	public <T extends BaseView> T runUntilView(final Class<T> classOfPage) throws Exception {
 		LOG.info("Run until view: "+classOfPage.getSimpleName());
-		class PageEndCondition implements EndState {
+		class ViewEndCondition implements EndState {
 			public boolean stop(Application application, BaseView view, String state) {
 				if(view.getClass() == classOfPage)
 					return true;
 				return false;
 			}
 		};
-		return (T) process(new PageEndCondition());
+		return (T) process(new ViewEndCondition());
 	}
 	
 
