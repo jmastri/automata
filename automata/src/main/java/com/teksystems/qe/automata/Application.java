@@ -18,6 +18,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
+import com.teksystems.qe.automata.exceptions.ViewInitializationException;
+import com.teksystems.qe.automata.exceptions.ViewNotDefinedException;
+import com.teksystems.qe.automata.exceptions.ViewProcessingException;
+import com.teksystems.qe.automata.interfaces.ApplicationListener;
+import com.teksystems.qe.automata.interfaces.BaseView;
+import com.teksystems.qe.automata.interfaces.EndState;
+
 /**
  * Application level automation framework.
  * 
@@ -29,8 +36,6 @@ import org.reflections.Reflections;
  * @author David Eltgroth
  * @author Jason Polk
  */
-
-
 
 public abstract class Application {
 	protected ApplicationConfiguration config							= null;
@@ -167,7 +172,6 @@ public abstract class Application {
 				Class[] cArg = new Class[args.length];
 				for(int i=0; i<args.length;i++)
 					cArg[i] = args.getClass();
-				
 				
 				Constructor<?>[] constructors 	= viewMap.get(lastState).getConstructors();
 				constructorLoop:
@@ -348,8 +352,7 @@ public abstract class Application {
 				it.remove();
 		}
 	}
-	
-	
+
 	/**
 	 * Utility function for generating a common EndState
 	 * 
@@ -368,6 +371,5 @@ public abstract class Application {
 		};
 		return (T) process(new ViewEndCondition());
 	}
-	
 
 }

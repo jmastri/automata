@@ -1,4 +1,7 @@
-package com.teksystems.qe.automata;
+package com.teksystems.qe.automata.interfaces;
+
+import com.teksystems.qe.automata.Application;
+import com.teksystems.qe.automata.ViewEvent;
 
 public interface ApplicationListener {
 

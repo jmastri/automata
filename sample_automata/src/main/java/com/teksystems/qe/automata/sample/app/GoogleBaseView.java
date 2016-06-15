@@ -3,7 +3,7 @@ package com.teksystems.qe.automata.sample.app;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 
-import com.teksystems.qe.automata.BaseView;
+import com.teksystems.qe.automata.interfaces.BaseView;
 import com.teksystems.qe.automata.sample.data.GenericDataObject;
 
 public abstract class GoogleBaseView implements BaseView{

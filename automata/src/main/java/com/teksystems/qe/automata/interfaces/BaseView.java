@@ -1,4 +1,4 @@
-package com.teksystems.qe.automata;
+package com.teksystems.qe.automata.interfaces;
 
 public interface BaseView {
 	public void complete();

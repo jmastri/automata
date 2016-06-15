@@ -31,7 +31,5 @@ public class ApplicationConfiguration {
 	public void setTransitionTimeout(long transitionTimeout) {
 		this.transitionTimeout = transitionTimeout;
 	}
-	
-	
-	
+
 }
