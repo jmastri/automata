@@ -18,7 +18,7 @@ import com.teksystems.qe.automata.sample.views.SearchResults;
 public class SampleTest {
 
 	@Test
-	public void aTest() throws Exception{
+	public void sampleTest() throws Exception{
 		//Data however you want to set it up
 		GenericDataObject data = new GenericDataObject();
 		data.setQuery("automata");
@@ -33,7 +33,7 @@ public class SampleTest {
 		SearchResults results = app.runUntilView(SearchResults.class);
 
 		Assert.assertNotNull(
-				results.findResultByUrl("https://en.wikipedia.org/wiki/Automaton"),
+				results.findResultByUrl("https://en.wikipedia.org/wiki/Automata_theory"),
 				"Expected to find the proper result");
 
 	}
@@ -43,9 +43,9 @@ public class SampleTest {
 	private WebDriver getDriver() throws MalformedURLException{
 		URL server 							= new URL("http://localhost:4444/wd/hub");
 		DesiredCapabilities capababilities 	= new DesiredCapabilities();
-		capababilities.setPlatform(Platform.WINDOWS);
-		capababilities.setBrowserName("chrome");
-		capababilities.setVersion("46");
+		capababilities.setPlatform(Platform.MAC);
+		capababilities.setBrowserName("firefox");
+		capababilities.setVersion("38");
 		capababilities.setJavascriptEnabled(true);
 		return new RemoteWebDriver(server, capababilities);
 	}

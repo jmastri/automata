@@ -1,1 +1,5 @@
 /test-output/
+/target/
+.project
+.class*
+.settings*
