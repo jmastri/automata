@@ -38,13 +38,15 @@ public class SampleTest {
 
 	}
 	
-	
-	
 	private WebDriver getDriver() throws MalformedURLException{
 		URL server 							= new URL("http://localhost:4444/wd/hub");
 		DesiredCapabilities capababilities 	= new DesiredCapabilities();
+		
+		// Set your OS (platform) here.
 		capababilities.setPlatform(Platform.MAC);
+		// Set your Browser here.
 		capababilities.setBrowserName("firefox");
+		// Set your Browser version here. This should be a number.
 		capababilities.setVersion("38");
 		capababilities.setJavascriptEnabled(true);
 		return new RemoteWebDriver(server, capababilities);
