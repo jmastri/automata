@@ -27,14 +27,14 @@ import com.teksystems.qe.automata.interfaces.EndState;
 
 /**
  * Application level automation framework.
- * 
- * 
+
  * @author James Mastri
  * @author Jeff Clyne
  * @author Matt Logston
  * @author Ben Kresky
  * @author David Eltgroth
  * @author Jason Polk
+ * @author Tony Hernandez
  */
 
 public abstract class Application {
@@ -361,6 +361,9 @@ public abstract class Application {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends BaseView> T runUntilView(final Class<T> classOfPage) throws Exception {
+	    if(!viewMap.values().contains(classOfPage)){
+	        throw new ViewNotDefinedException(classOfPage.getSimpleName()+" is not mapped, verify you set this view up properly.", new RuntimeException());
+	    }
 		LOG.info("Run until view: "+classOfPage.getSimpleName());
 		class ViewEndCondition implements EndState {
 			public boolean stop(Application application, BaseView view, String state) {
