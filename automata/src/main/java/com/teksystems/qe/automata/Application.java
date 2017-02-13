@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
+import com.teksystems.qe.automata.annotations.ViewStates;
 import com.teksystems.qe.automata.exceptions.ViewInitializationException;
 import com.teksystems.qe.automata.exceptions.ViewNotDefinedException;
 import com.teksystems.qe.automata.exceptions.ViewProcessingException;
@@ -38,14 +39,14 @@ import com.teksystems.qe.automata.interfaces.EndState;
  */
 
 public abstract class Application {
-    protected ApplicationConfiguration config = null;
-    protected Logger LOG = LogManager.getLogger(this.getClass());
-    protected Map<String, Class<? extends BaseView>> viewMap = new HashMap<String, Class<? extends BaseView>>();
-    protected boolean breakOut = false;
-    protected Stack<BaseView> viewStack = new Stack<BaseView>();
-    protected BaseView currentView = null;
-    protected String lastState = null;
-    protected Map<String, ApplicationListener> listeners = new HashMap<String, ApplicationListener>();
+    protected Logger LOG                                        = LogManager.getLogger(this.getClass());
+    protected ApplicationConfiguration config                   = null;
+    protected Map<String, Class<? extends BaseView>> viewMap    = new HashMap<String, Class<? extends BaseView>>();
+    protected boolean breakOut                                  = false;
+    protected Stack<BaseView> viewStack                         = new Stack<BaseView>();
+    protected BaseView currentView                              = null;
+    protected String lastState                                  = null;
+    protected Map<String, ApplicationListener> listeners        = new HashMap<String, ApplicationListener>();
 
     public Application() {
         this(new ApplicationConfiguration());
@@ -77,7 +78,7 @@ public abstract class Application {
 
     private void initialize() {
         viewMap.clear();
-        LOG.info("Loading Views.");
+        LOG.info("[AUTOMATA] Loading Views.");
         Reflections reflections = null;
         if (config.getBasePackage() != null) {
             reflections = new Reflections(config.getBasePackage());
@@ -88,16 +89,16 @@ public abstract class Application {
         Iterator<Class<? extends BaseView>> it = allPages.iterator();
         while (it.hasNext()) {
             Class<? extends BaseView> checkMe = it.next();
-            LOG.debug("Found view " + checkMe.getSimpleName() + " extends BaseView");
+            LOG.debug("[AUTOMATA] Found view " + checkMe.getSimpleName() + " extends BaseView");
             ViewStates annotation = checkMe.getAnnotation(ViewStates.class);
 
             if (Modifier.isAbstract(checkMe.getModifiers())) {
-                LOG.debug("Defined view '" + checkMe.getName() + "' is abstract not loading");
+                LOG.debug("[AUTOMATA] Defined view '" + checkMe.getName() + "' is abstract not loading");
                 continue;
             }
 
             if (annotation == null) {
-                LOG.warn("Defined view '" + checkMe.getName() + "' is missing @ViewStates annotation not loaded");
+                LOG.warn("[AUTOMATA] Defined view '" + checkMe.getName() + "' is missing @ViewStates annotation not loaded");
                 continue;
             }
 
@@ -105,15 +106,15 @@ public abstract class Application {
             for (int i = 0; i < stateArr.length; i++) {
                 String state = stateArr[i];
                 if (viewMap.containsKey(state)) {
-                    LOG.error("Multiple views with the state defined as: \"" + state + "\"");
-                    LOG.error(viewMap.get(state).getSimpleName() + " in map already");
-                    LOG.error(checkMe.getSimpleName() + " - SKIPPED");
+                    LOG.error("[AUTOMATA] Multiple views with the state defined as: \"" + state + "\"");
+                    LOG.error("[AUTOMATA] "+viewMap.get(state).getSimpleName() + " in map already");
+                    LOG.error("[AUTOMATA] "+checkMe.getSimpleName() + " - SKIPPED");
                     continue;
                 }
                 viewMap.put(state, checkMe);
             }
         } // end iterator
-        LOG.info("Views loaded found " + viewMap.size() + " views.");
+        LOG.info("[AUTOMATA] Views loaded found " + viewMap.size() + " views.");
     }
 
     /**
@@ -122,7 +123,7 @@ public abstract class Application {
      */
     public void waitForStateChange() {
         long start = System.currentTimeMillis();
-        LOG.info("waiting for transition from: " + currentView.getClass().getSimpleName() + " [state=\"" + lastState
+        LOG.info("[AUTOMATA] waiting for transition from: " + currentView.getClass().getSimpleName() + " [state=\"" + lastState
                 + "\"]");
         while (lastState.equalsIgnoreCase(getState())) {
             if (System.currentTimeMillis() - start > config.getTransitionTimeout()) {
@@ -189,7 +190,7 @@ public abstract class Application {
                             continue constructorLoop;
                         }
                     }
-                    LOG.info("Current View: " + viewMap.get(lastState).getSimpleName() + " [state=\"" + lastState
+                    LOG.info("[AUTOMATA] Current View: " + viewMap.get(lastState).getSimpleName() + " [state=\"" + lastState
                             + "\"]");
                     return (BaseView) thisConstructor.newInstance(args);
                 }
@@ -229,12 +230,12 @@ public abstract class Application {
                 callListeners(ViewEvent.DETECTED);
 
                 if (end.stop(this, currentView, lastState)) {
-                    LOG.info("End condition reached, stopping process.");
+                    LOG.info("[AUTOMATA] End condition reached, stopping process.");
                     break;
                 }
 
                 if (breakOut) {
-                    LOG.info("Break out set, stopping process");
+                    LOG.info("[AUTOMATA] Break out set, stopping process");
                     break;
                 }
                 ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -258,11 +259,11 @@ public abstract class Application {
 
                 callListeners(ViewEvent.AFTER_COMPLETE);
                 if (end.stop(this, currentView, lastState)) {
-                    LOG.info("End condition reached, stopping process.");
+                    LOG.info("[AUTOMATA] End condition reached, stopping process.");
                     break;
                 }
                 if (breakOut) {
-                    LOG.info("Break out set, stopping process");
+                    LOG.info("[AUTOMATA] Break out set, stopping process");
                     break;
                 }
                 if (config.isCallNavigate()) {
@@ -287,7 +288,7 @@ public abstract class Application {
                     }
                     callListeners(ViewEvent.AFTER_NAVIGATE);
                     if (breakOut) {
-                        LOG.info("Break out set, stopping process");
+                        LOG.info("[AUTOMATA] Break out set, stopping process");
                         break;
                     }
                 }
@@ -295,11 +296,11 @@ public abstract class Application {
                 waitForStateChange();
                 callListeners(ViewEvent.VIEW_CHANGE);
                 if (end.stop(this, currentView, lastState)) {
-                    LOG.info("End condition reached, stopping process.");
+                    LOG.info("[AUTOMATA] End condition reached, stopping process.");
                     break;
                 }
                 if (breakOut) {
-                    LOG.info("Break out set, stopping process");
+                    LOG.info("[AUTOMATA] Break out set, stopping process");
                     break;
                 }
             }
@@ -320,7 +321,7 @@ public abstract class Application {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void callListeners(final ViewEvent evt) {
-        LOG.debug("Calling event listeners for " + evt.name());
+        LOG.debug("[AUTOMATA] Calling event listeners for " + evt.name());
         final Iterator<ApplicationListener> it = listeners.values().iterator();
         final Application me = this;
         while (it.hasNext()) {

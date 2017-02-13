@@ -1,4 +1,4 @@
-package com.teksystems.qe.automata;
+package com.teksystems.qe.automata.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
