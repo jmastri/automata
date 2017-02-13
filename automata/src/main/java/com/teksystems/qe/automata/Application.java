@@ -78,25 +78,29 @@ public abstract class Application {
 
     private void initialize() {
         viewMap.clear();
-        LOG.info("[AUTOMATA] Loading Views.");
         Reflections reflections = null;
         if (config.getBasePackage() != null) {
+            LOG.info("[AUTOMATA] Loading Views from base package: \""+config.getBasePackage()+"\" ...");
             reflections = new Reflections(config.getBasePackage());
         } else {
+            LOG.info("[AUTOMATA] Loading Views ...");
             reflections = new Reflections();
         }
-        Set<Class<? extends BaseView>> allPages = reflections.getSubTypesOf(BaseView.class);
-        Iterator<Class<? extends BaseView>> it = allPages.iterator();
+        Set<Class<? extends BaseView>> allPages     = reflections.getSubTypesOf(BaseView.class);
+        Iterator<Class<? extends BaseView>> it      = allPages.iterator();
+        if(!it.hasNext()){
+            LOG.error("[AUTOMATA] Failed to find any classes that implement BaseView");
+        }
         while (it.hasNext()) {
             Class<? extends BaseView> checkMe = it.next();
             LOG.debug("[AUTOMATA] Found view " + checkMe.getSimpleName() + " extends BaseView");
-            ViewStates annotation = checkMe.getAnnotation(ViewStates.class);
-
+            
             if (Modifier.isAbstract(checkMe.getModifiers())) {
                 LOG.debug("[AUTOMATA] Defined view '" + checkMe.getName() + "' is abstract not loading");
                 continue;
             }
-
+            
+            ViewStates annotation = checkMe.getAnnotation(ViewStates.class);
             if (annotation == null) {
                 LOG.warn("[AUTOMATA] Defined view '" + checkMe.getName() + "' is missing @ViewStates annotation not loaded");
                 continue;
@@ -114,7 +118,7 @@ public abstract class Application {
                 viewMap.put(state, checkMe);
             }
         } // end iterator
-        LOG.info("[AUTOMATA] Views loaded found " + viewMap.size() + " views.");
+        LOG.info("[AUTOMATA] Views loaded found " + viewMap.size() + " view(s).");
     }
 
     /**
@@ -123,8 +127,7 @@ public abstract class Application {
      */
     public void waitForStateChange() {
         long start = System.currentTimeMillis();
-        LOG.info("[AUTOMATA] waiting for transition from: " + currentView.getClass().getSimpleName() + " [state=\"" + lastState
-                + "\"]");
+        LOG.info("[AUTOMATA] waiting for transition from: " + currentView.getClass().getSimpleName() + " [state=\"" + lastState+ "\"]");
         while (lastState.equalsIgnoreCase(getState())) {
             if (System.currentTimeMillis() - start > config.getTransitionTimeout()) {
                 break;
@@ -247,12 +250,12 @@ public abstract class Application {
                     }
                 });
                 try {
-                    handler.get(config.getViewTimeout(), TimeUnit.MILLISECONDS);
+                    handler.get(config.getViewTimeout(currentView), TimeUnit.MILLISECONDS);
                 } catch (TimeoutException e) {
                     LOG.error(e);
                     handler.cancel(true);
                     throw new ViewProcessingException("View " + currentView.getClass().getSimpleName()
-                            + " complete action took longer than " + config.getViewTimeout() + " ms to complete", e);
+                            + " complete action took longer than " + config.getViewTimeout(currentView) + " ms to complete", e);
                 } finally {
                     executor.shutdownNow();
                 }
@@ -277,12 +280,12 @@ public abstract class Application {
                         }
                     });
                     try {
-                        navHandler.get(config.getViewTimeout(), TimeUnit.MILLISECONDS);
+                        navHandler.get(config.getViewTimeout(currentView), TimeUnit.MILLISECONDS);
                     } catch (Exception e) {
                         LOG.error(e);
                         navHandler.cancel(true);
                         throw new ViewProcessingException("View " + currentView.getClass().getSimpleName()
-                                + " navigate action took longer than 2 minutes to complete", e);
+                                + " navigate action took longer than " + config.getViewTimeout(currentView) + " ms to complete", e);
                     } finally {
                         executor.shutdownNow();
                     }
@@ -383,7 +386,7 @@ public abstract class Application {
                     classOfPage.getSimpleName() + " is not mapped, verify you set this view up properly.",
                     new RuntimeException());
         }
-        LOG.info("Run until view: " + classOfPage.getSimpleName());
+        LOG.info("[AUTOMATA] Run until view: " + classOfPage.getSimpleName());
         class ViewEndCondition implements EndState {
             public boolean stop(Application application, BaseView view, String state) {
                 if (view.getClass() == classOfPage)
@@ -395,4 +398,34 @@ public abstract class Application {
         return (T) process(new ViewEndCondition());
     }
 
+    public ApplicationConfiguration getConfig() {
+        return config;
+    }
+
+    public void setConfig(ApplicationConfiguration config) {
+        this.config = config;
+    }
+
+    public boolean isBreakOut() {
+        return breakOut;
+    }
+
+    public void setBreakOut(boolean breakOut) {
+        this.breakOut = breakOut;
+    }
+
+    public Map<String, Class<? extends BaseView>> getViewMap() {
+        return viewMap;
+    }
+
+    public Stack<BaseView> getViewStack() {
+        return viewStack;
+    }
+
+    public String getLastState() {
+        return lastState;
+    }
+
+    
+    
 }

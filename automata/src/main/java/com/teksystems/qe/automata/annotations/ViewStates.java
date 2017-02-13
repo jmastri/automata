@@ -8,5 +8,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ViewStates {
-    String[] value();
+    String[] value();               //Used to map string states to this view
+    long timeOut() default 0;       //Used to override application level page timeouts
 }
