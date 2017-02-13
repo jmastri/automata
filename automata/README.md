@@ -1,6 +1,6 @@
 # automata
 
-Application layer framework for automation.  
+Application layer framework for automation, to isolate buiness legic test cases from navigation/UI.  
 
 
 ## Build
