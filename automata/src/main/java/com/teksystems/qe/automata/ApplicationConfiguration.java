@@ -1,15 +1,15 @@
 package com.teksystems.qe.automata;
 
+import com.teksystems.qe.automata.annotations.ViewStates;
+import com.teksystems.qe.automata.interfaces.BaseView;
+
 public class ApplicationConfiguration {
 
-    private long viewTimeout = 60 * 1000;
-    private long transitionTimeout = 60 * 1000;
-    private boolean callNavigate = true;
-    private String basePackage = null;
+    private long viewTimeout        = 60 * 1000;
+    private long transitionTimeout  = 60 * 1000;
+    private boolean callNavigate    = true;
+    private String basePackage      = null;
 
-    public long getViewTimeout() {
-        return viewTimeout;
-    }
 
     public void setViewTimeout(long viewTimeout) {
         this.viewTimeout = viewTimeout;
@@ -37,6 +37,16 @@ public class ApplicationConfiguration {
 
     public void setTransitionTimeout(long transitionTimeout) {
         this.transitionTimeout = transitionTimeout;
+    }
+
+    public long getViewTimeout(BaseView currentView) {
+        ViewStates annotation;
+        if((annotation = currentView.getClass().getAnnotation(ViewStates.class))!=null){
+            if(annotation.timeOut()>0){
+                return annotation.timeOut();
+            }
+        }
+        return viewTimeout;
     }
 
 }

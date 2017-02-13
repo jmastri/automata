@@ -83,7 +83,7 @@ public class SampleTest {
 		// Set your Browser here.
 		capababilities.setBrowserName("firefox");
 		// Set your Browser version here. This should be a number.
-		capababilities.setVersion("38");
+		capababilities.setVersion("47");
 		capababilities.setJavascriptEnabled(true);
 		return new RemoteWebDriver(server, capababilities);
 	}
