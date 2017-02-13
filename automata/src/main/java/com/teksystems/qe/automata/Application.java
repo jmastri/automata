@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
+import com.teksystems.qe.automata.annotations.ViewStates;
 import com.teksystems.qe.automata.exceptions.ViewInitializationException;
 import com.teksystems.qe.automata.exceptions.ViewNotDefinedException;
 import com.teksystems.qe.automata.exceptions.ViewProcessingException;
