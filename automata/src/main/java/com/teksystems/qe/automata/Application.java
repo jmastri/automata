@@ -78,6 +78,9 @@ public abstract class Application {
      */
 
     private void initialize() {
+        if(initialized){
+            return;
+        }
         viewMap.clear();
         Reflections reflections = null;
         if (config.getBasePackage() != null) {
@@ -120,6 +123,7 @@ public abstract class Application {
             }
         } // end iterator
         LOG.info("[AUTOMATA] Views loaded found " + viewMap.size() + " view(s).");
+        initialized= true;
     }
 
     /**
@@ -227,10 +231,7 @@ public abstract class Application {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public BaseView process(EndState end) throws Exception {
-        if(!initialized){
-            initialize();
-            initialized= true;
-        }
+        initialize();
         try {
             while (!breakOut) {
                 currentView = getCurrentView();
@@ -386,7 +387,7 @@ public abstract class Application {
 
     @SuppressWarnings("unchecked")
     public <T extends BaseView> T runUntilView(final Class<T> classOfPage) throws Exception {
-        if (!viewMap.values().contains(classOfPage)) {
+        if (!getViewMap().values().contains(classOfPage)) {
             throw new ViewNotDefinedException(
                     classOfPage.getSimpleName() + " is not mapped, verify you set this view up properly.",
                     new RuntimeException());
@@ -420,6 +421,7 @@ public abstract class Application {
     }
 
     public Map<String, Class<? extends BaseView>> getViewMap() {
+        initialize();
         return viewMap;
     }
 
