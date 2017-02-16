@@ -29,7 +29,7 @@ public class SampleTest {
 
 		AmazonUser user       = new AmazonUser();
 		Item buyMe            = new Item();
-		buyMe.setItemName("Dove Soap");
+		buyMe.setItemName("TurboTax 2016 Basic");
 		
 		user.addItemToBuy(buyMe);
         //create an instance of the application

@@ -15,9 +15,9 @@ public abstract class AmazonBaseView implements BaseView{
 	/**
 	 * Define global elements here
 	 */
-	@FindBy(xpath="//input[@name='field-keywords']")
+    @FindBy(xpath="//input[@name='field-keywords']")
     WebElement searchInput;
-	@FindBy(xpath="//input[contains(@class,'nav-input') and @type='submit']")
+    @FindBy(xpath="//input[contains(@class,'nav-input') and @type='submit']")
     WebElement searchSubmit;
 	
 	public AmazonBaseView(WebDriver driver, AmazonUser user){
