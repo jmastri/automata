@@ -22,7 +22,7 @@ public class SampleTest {
 	 * Sample test case that launches a browser, goes to google and searches for 'automata'
 	 * and verified the results return a link to https://en.wikipedia.org/wiki/Automata_theory
 	 */
-	@Test
+	@Test()
 	public void sampleTest() throws Exception{
 		//Data however you want to set it up
 		GenericDataObject data = new GenericDataObject();
@@ -49,7 +49,7 @@ public class SampleTest {
 	 * from the google search. The string to search for and the URL to verify the results against come from
 	 * a data provider.
 	 */
-	@Test(dataProvider = "search-data")
+	@Test(dataProvider = "search-data", enabled=false)
 	public void sampleDataDrivenTest(String searchString, String resultsUrl) throws Exception{
 		//Data however you want to set it up
 				GenericDataObject data = new GenericDataObject();
