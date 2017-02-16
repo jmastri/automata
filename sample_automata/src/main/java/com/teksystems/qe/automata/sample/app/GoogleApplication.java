@@ -43,6 +43,9 @@ public class GoogleApplication extends Application {
             }
         };
         this.registerListener(new StateLogger());
+        
+        config.setBasePackage("com.teksystems.qe.automata.sample.views");
+        initialize();
 	}
 
 	@Override
