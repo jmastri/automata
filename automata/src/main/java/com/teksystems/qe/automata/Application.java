@@ -42,7 +42,7 @@ import com.teksystems.qe.automata.interfaces.EndState;
 public abstract class Application {
     protected Logger LOG                                        = LogManager.getLogger(this.getClass());
     protected ApplicationConfiguration config                   = null;
-    protected Map<String, Class<? extends BaseView>> viewMap    = new HashMap<String, Class<? extends BaseView>>();
+    private Map<String, Class<? extends BaseView>> viewMap    = new HashMap<String, Class<? extends BaseView>>();
     protected boolean breakOut                                  = false;
     protected Stack<BaseView> viewStack                         = new Stack<BaseView>();
     protected BaseView currentView                              = null;
