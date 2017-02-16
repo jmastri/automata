@@ -36,6 +36,7 @@ import com.teksystems.qe.automata.interfaces.EndState;
  * @author David Eltgroth
  * @author Jason Polk
  * @author Tony Hernandez
+ * 
  */
 
 public abstract class Application {
@@ -76,7 +77,7 @@ public abstract class Application {
      * Uses reflection to fill the map of views
      */
 
-    private void initialize() {
+    protected void initialize() {
         viewMap.clear();
         Reflections reflections = null;
         if (config.getBasePackage() != null) {
@@ -424,8 +425,5 @@ public abstract class Application {
 
     public String getLastState() {
         return lastState;
-    }
-
-    
-    
+    } 
 }
