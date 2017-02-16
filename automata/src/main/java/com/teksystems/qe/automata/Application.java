@@ -48,6 +48,7 @@ public abstract class Application {
     protected BaseView currentView                              = null;
     protected String lastState                                  = null;
     protected Map<String, ApplicationListener> listeners        = new HashMap<String, ApplicationListener>();
+    boolean initialized                                         = false;
 
     public Application() {
         this(new ApplicationConfiguration());
@@ -55,7 +56,6 @@ public abstract class Application {
 
     public Application(ApplicationConfiguration configuration) {
         config = configuration;
-        initialize();
     }
 
     /**
@@ -77,7 +77,7 @@ public abstract class Application {
      * Uses reflection to fill the map of views
      */
 
-    protected void initialize() {
+    private void initialize() {
         viewMap.clear();
         Reflections reflections = null;
         if (config.getBasePackage() != null) {
@@ -227,6 +227,10 @@ public abstract class Application {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public BaseView process(EndState end) throws Exception {
+        if(!initialized){
+            initialize();
+            initialized= true;
+        }
         try {
             while (!breakOut) {
                 currentView = getCurrentView();

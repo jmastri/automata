@@ -17,10 +17,8 @@ public class AmazonApplication extends Application {
     public AmazonApplication(WebDriver driver, AmazonUser user){
         
         this.driver = driver;
-        this.user   = user;
-        
+        this.user   = user;        
         config.setBasePackage("com.teksystems.qe.automata.sample.amazon.views");
-        initialize();
     }
     
     @Override

@@ -42,10 +42,9 @@ public class GoogleApplication extends Application {
                 LOG.info("[STATE LOGGER] "+event.name()+" was triggered on view: "+view.getClass().getSimpleName());
             }
         };
-        this.registerListener(new StateLogger());
-        
+        this.registerListener(new StateLogger());        
         config.setBasePackage("com.teksystems.qe.automata.sample.views");
-        initialize();
+
 	}
 
 	@Override
