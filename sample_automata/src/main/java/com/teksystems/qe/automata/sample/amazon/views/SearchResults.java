@@ -70,10 +70,25 @@ public class SearchResults extends AmazonBaseView{
 
     
     public List<SearchResult> getSearchResults(){
-        List<WebElement> eles = driver.findElements(By.xpath("//li[contains(@id,'result_')]"));
-        List<SearchResult> ret = new ArrayList<SearchResult>();
-        for(WebElement ele : eles){
-            ret.add(new SearchResult(ele));
+        long start  = System.currentTimeMillis();
+        List<SearchResult> ret      = new ArrayList<SearchResult>();
+        
+        while(true){
+            List<WebElement> eles   = driver.findElements(By.xpath("//li[contains(@id,'result_')]"));
+            if(eles.size() == 0){
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {}
+                continue;
+            }
+            if(System.currentTimeMillis()-start>10000){
+                return ret;
+            }
+            for(WebElement ele : eles){
+                ret.add(new SearchResult(ele));
+            }
+            break;
+            
         }
         return ret;
     }
