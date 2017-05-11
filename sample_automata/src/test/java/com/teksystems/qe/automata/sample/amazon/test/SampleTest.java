@@ -58,9 +58,9 @@ public class SampleTest {
 		// Set your OS (platform) here.
 		capababilities.setPlatform(Platform.MAC);
 		// Set your Browser here.
-		capababilities.setBrowserName("firefox");
+		capababilities.setBrowserName("chrome");
 		// Set your Browser version here. This should be a number.
-		capababilities.setVersion("47");
+		capababilities.setVersion("58");
 		capababilities.setJavascriptEnabled(true);
 		
 		RemoteWebDriver ret = new RemoteWebDriver(server, capababilities);
