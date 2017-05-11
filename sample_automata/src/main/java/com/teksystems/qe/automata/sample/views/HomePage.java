@@ -5,8 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.teksystems.qe.automata.ViewStates;
-import com.teksystems.qe.automata.sample.app.GoogleBaseView;
+import com.teksystems.qe.automata.annotations.ViewStates;
 import com.teksystems.qe.automata.sample.data.GenericDataObject;
 
 @ViewStates("search")

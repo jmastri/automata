@@ -36,6 +36,15 @@ public class GoogleApplication extends Application {
 			}
 		};
 		this.registerListener(new ChangeState());
+		
+		class StateLogger implements ApplicationListener{
+            public void handleEvent(ViewEvent event, Application application, BaseView view, String state) {
+                LOG.info("[STATE LOGGER] "+event.name()+" was triggered on view: "+view.getClass().getSimpleName());
+            }
+        };
+        this.registerListener(new StateLogger());        
+        config.setBasePackage("com.teksystems.qe.automata.sample.views");
+
 	}
 
 	@Override

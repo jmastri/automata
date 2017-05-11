@@ -3,8 +3,7 @@ package com.teksystems.qe.automata.sample.views;
 
 import org.openqa.selenium.WebDriver;
 
-import com.teksystems.qe.automata.ViewStates;
-import com.teksystems.qe.automata.sample.app.GoogleBaseView;
+import com.teksystems.qe.automata.annotations.ViewStates;
 import com.teksystems.qe.automata.sample.data.GenericDataObject;
 
 @ViewStates("initialize")
